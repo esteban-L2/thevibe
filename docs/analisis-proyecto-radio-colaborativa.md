@@ -142,6 +142,18 @@ El nombre del proyecto (**thevibe**) juega justo con esta idea: la IA no es un a
 
 ---
 
+## 8. Decisiones tomadas
+
+Respuestas a las preguntas de la sección 7:
+
+- **Frontend**: React + Vite (SPA). Next.js descartado porque el backend ya es FastAPI y SSR agregaría complejidad sin necesidad.
+- **Auth**: usuarios anónimos de Supabase para el MVP. Email/Google queda para v2.
+- **Música**: YouTube (Data API v3 para búsqueda + embed). Spotify queda para v2.
+- **Poderes del host**: el host siempre puede saltar canción y decide si los invitados también pueden (un interruptor por sala, p. ej. `rooms.guests_can_skip`). Expulsar usuarios y otra moderación quedan para v2.
+- **Rama principal**: el repo usa `master` (donde este documento dice `main`, se refiere a `master`).
+
+---
+
 ## 9. Preferencia de aprendizaje: Git/GitHub por consola
 
 El usuario quiere aprender a usar Git/GitHub desde la terminal a la par que construye el proyecto, no solo que el código funcione. Esto debe respetarse durante todo el desarrollo:
