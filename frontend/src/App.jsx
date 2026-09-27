@@ -13,7 +13,7 @@ function App() {
 
   return (
     <div>
-      <h1>thevibe</h1>
+            <h1 className="text-4xl font-bold text-violet-500">thevibe</h1>
       <p>Backend: {estado}</p>
     </div>
   )
