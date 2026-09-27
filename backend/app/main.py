@@ -13,6 +13,15 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+@app.get("/")
+def root():
+    return {
+        "service": "thevibe API",
+        "version": "0.1.0",
+        "docs": "/docs",
+        "endpoints": ["/health", "/rooms"],
+    }
+
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "thevibe API is running"}
