@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 
 function App() {
+  const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
   const [estado, setEstado] = useState('consultando...')
 
   useEffect(() => {
-    fetch('http://localhost:8000/health')
+    fetch(`${API_URL}/health`)
       .then((res) => res.json())
       .then((data) => setEstado(data.status))
       .catch((err) => setEstado('error: ' + err.message))
