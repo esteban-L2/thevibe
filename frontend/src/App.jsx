@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
+import { supabase } from './lib/supabase'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
@@ -17,12 +18,35 @@ const TEXTOS = {
 
 function App() {
   const [estado, setEstado] = useState('cargando')
+  const [usuario, setUsuario] = useState(null)
 
   useEffect(() => {
     fetch(`${API_URL}/health`)
       .then((res) => res.json())
       .then(() => setEstado('ok'))
       .catch(() => setEstado('error'))
+  }, [])
+
+  useEffect(() => {
+    async function iniciarSesion() {
+      const { data: { session } } = await supabase.auth.getSession()
+
+      if (session) {
+        setUsuario(session.user)
+        return
+      }
+
+      const { data, error } = await supabase.auth.signInAnonymously()
+
+      if (error) {
+        console.error('Error al iniciar sesión anónima:', error.message)
+        return
+      }
+
+      setUsuario(data.user)
+    }
+
+    iniciarSesion()
   }, [])
 
   return (
@@ -48,13 +72,18 @@ function App() {
           que la sala encuentre su vibe.
         </p>
 
-        <div className="mt-10 flex items-center gap-2 text-sm text-neutral-500">
-          <span
-            className={`h-2 w-2 rounded-full ${COLORES[estado]} ${
-              estado === 'cargando' ? 'animate-pulse' : ''
-            }`}
-          />
-          {TEXTOS[estado]}
+        <div className="mt-10 flex flex-col items-center gap-2 text-sm text-neutral-500">
+          <div className="flex items-center gap-2">
+            <span
+              className={`h-2 w-2 rounded-full ${COLORES[estado]} ${
+                estado === 'cargando' ? 'animate-pulse' : ''
+              }`}
+            />
+            {TEXTOS[estado]}
+          </div>
+          <div className="font-mono text-xs text-neutral-600">
+            {usuario ? `sesión: ${usuario.id.slice(0, 8)}` : 'creando sesión…'}
+          </div>
         </div>
       </motion.div>
 

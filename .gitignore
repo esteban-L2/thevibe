@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# El .gitignore de Python ignora lib/ y build/, pero el frontend sí usa src/lib
+!frontend/src/lib/
