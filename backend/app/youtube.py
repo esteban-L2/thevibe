@@ -30,15 +30,24 @@ def buscar_canciones(consulta: str, maximo: int = 8) -> list[dict]:
     )
     respuesta.raise_for_status()
 
-    resultados = [
-        {
-            "video_id": item["id"]["videoId"],
-            "title": item["snippet"]["title"],
-            "channel": item["snippet"]["channelTitle"],
-            "thumbnail_url": item["snippet"]["thumbnails"]["medium"]["url"],
-        }
-        for item in respuesta.json().get("items", [])
-    ]
+        resultados = []
+
+    for item in respuesta.json().get("items", []):
+        video_id = item.get("id", {}).get("videoId")
+        snippet = item.get("snippet", {})
+
+        if not video_id or not snippet.get("title"):
+            continue
+
+        miniaturas = snippet.get("thumbnails", {})
+        miniatura = miniaturas.get("medium") or miniaturas.get("default") or {}
+
+        resultados.append({
+            "video_id": video_id,
+            "title": snippet["title"],
+            "channel": snippet.get("channelTitle"),
+            "thumbnail_url": miniatura.get("url"),
+        })
 
     _cache[clave] = (time.time(), resultados)
     return resultados
