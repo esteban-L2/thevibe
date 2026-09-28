@@ -3,8 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.db import supabase
 from app.config import FRONTEND_ORIGINS
 from app.auth import usuario_actual
+from app.rooms import router as rooms_router
 
 app = FastAPI(title="thevibe API", version="0.1.0", description="API for thevibe application")
+app.include_router(rooms_router)
 
 app.add_middleware(
     CORSMiddleware,
