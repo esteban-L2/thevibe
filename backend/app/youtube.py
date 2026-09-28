@@ -30,7 +30,7 @@ def buscar_canciones(consulta: str, maximo: int = 8) -> list[dict]:
     )
     respuesta.raise_for_status()
 
-        resultados = []
+    resultados = []
 
     for item in respuesta.json().get("items", []):
         video_id = item.get("id", {}).get("videoId")
