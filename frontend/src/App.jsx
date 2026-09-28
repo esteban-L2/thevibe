@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import { supabase } from './lib/supabase'
+import { apiFetch } from './lib/api'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
@@ -19,6 +20,7 @@ const TEXTOS = {
 function App() {
   const [estado, setEstado] = useState('cargando')
   const [usuario, setUsuario] = useState(null)
+  const [servidorMe, setServidorMe] = useState(null)
 
   useEffect(() => {
     fetch(`${API_URL}/health`)
@@ -48,6 +50,14 @@ function App() {
 
     iniciarSesion()
   }, [])
+
+  useEffect(() => {
+    if (!usuario) return
+
+    apiFetch('/me')
+      .then((datos) => setServidorMe(datos.id.slice(0, 8)))
+      .catch((err) => console.error('Error al llamar /me:', err.message))
+  }, [usuario])
 
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-neutral-950 px-6 py-24 text-center">
@@ -83,6 +93,7 @@ function App() {
           </div>
           <div className="font-mono text-xs text-neutral-600">
             {usuario ? `sesión: ${usuario.id.slice(0, 8)}` : 'creando sesión…'}
+            {servidorMe && ` · backend te reconoce: ${servidorMe}`}
           </div>
         </div>
       </motion.div>
