@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { supabase } from '../lib/supabase'
 import { apiFetch } from '../lib/api'
+import Buscador from '../components/Buscador'
+import Cola from '../components/Cola'
 
 function Sala({ usuario }) {
   const { code } = useParams()
@@ -101,7 +103,7 @@ function Sala({ usuario }) {
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className="relative z-10 flex w-full max-w-sm flex-col items-center"
+      className="relative z-10 flex w-full max-w-xl flex-col items-center"
     >
       <p className="text-xs uppercase tracking-widest text-neutral-500">sala</p>
 
@@ -111,27 +113,37 @@ function Sala({ usuario }) {
 
       <button
         onClick={copiarCodigo}
-        className="group mt-8 rounded-2xl border border-white/10 bg-white/5 px-8 py-5 transition-colors hover:border-violet-500/50"
+        className="group mt-6 rounded-2xl border border-white/10 bg-white/5 px-8 py-4 transition-colors hover:border-violet-500/50"
       >
-        <span className="font-mono text-4xl font-semibold tracking-[0.3em] text-violet-300">
+        <span className="font-mono text-3xl font-semibold tracking-[0.3em] text-violet-300">
           {sala.code}
         </span>
-        <span className="mt-2 block text-xs text-neutral-500 group-hover:text-neutral-400">
+        <span className="mt-1 block text-xs text-neutral-500 group-hover:text-neutral-400">
           {copiado ? '¡copiado!' : 'toca para copiar'}
         </span>
       </button>
 
-      <div className="mt-8 flex items-center gap-3 text-sm text-neutral-400">
+      <div className="mt-6 flex items-center gap-3 text-sm text-neutral-400">
         <span className="flex h-2 w-2 rounded-full bg-emerald-400" />
         {miembros.length} {miembros.length === 1 ? 'persona' : 'personas'} en la
         sala
+        {esHost && (
+          <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-xs uppercase tracking-widest text-violet-300">
+            host
+          </span>
+        )}
       </div>
 
-      {esHost && (
-        <span className="mt-4 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-xs uppercase tracking-widest text-violet-300">
-          eres el host
-        </span>
-      )}
+      <div className="mt-10 w-full">
+        <Buscador code={sala.code} />
+      </div>
+
+      <div className="mt-8 w-full">
+        <p className="mb-3 text-left text-xs uppercase tracking-widest text-neutral-500">
+          en cola
+        </p>
+        <Cola salaId={sala.id} />
+      </div>
 
       <Link
         to="/"

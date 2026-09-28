@@ -5,12 +5,13 @@ from postgrest.exceptions import APIError
 
 from app.auth import usuario_actual
 from app.db import supabase
-from app.schemas import CrearSala
+from app.schemas import AgregarCancion, CrearSala
 
 router = APIRouter(prefix="/rooms", tags=["salas"])
 
 ALFABETO = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 CODIGO_DUPLICADO = "23505"
+LIMITE_POR_USUARIO = 3
 
 
 def generar_codigo(longitud: int = 6) -> str:
@@ -69,3 +70,44 @@ def unirse_a_sala(code: str, usuario=Depends(usuario_actual)):
             raise
 
     return sala
+
+@router.post("/{code}/queue", status_code=201)
+def agregar_a_cola(code: str, datos: AgregarCancion, usuario=Depends(usuario_actual)):
+    sala = obtener_sala(code)
+
+    pendientes = (
+        supabase.table("queue_items")
+        .select("id", count="exact")
+        .eq("room_id", sala["id"])
+        .eq("added_by", usuario.id)
+        .eq("status", "pending")
+        .execute()
+    )
+
+    if pendientes.count >= LIMITE_POR_USUARIO:
+        raise HTTPException(
+            status_code=429,
+            detail=f"Ya tienes {LIMITE_POR_USUARIO} canciones esperando. Deja sonar alguna.",
+        )
+
+    try:
+        resultado = (
+            supabase.table("queue_items")
+            .insert({
+                "room_id": sala["id"],
+                "video_id": datos.video_id,
+                "title": datos.title,
+                "channel": datos.channel,
+                "thumbnail_url": datos.thumbnail_url,
+                "added_by": usuario.id,
+            })
+            .execute()
+        )
+    except APIError as error:
+        if error.code == CODIGO_DUPLICADO:
+            raise HTTPException(
+                status_code=409, detail="Esa canción ya está en la cola"
+            )
+        raise
+
+    return resultado.data[0]
