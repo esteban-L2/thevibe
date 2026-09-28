@@ -75,7 +75,7 @@ Queda en http://localhost:5173. Por defecto apunta a `http://localhost:8000`; pa
 ## Hoja de ruta
 
 - [x] **Fase 0** — Infraestructura: Supabase, FastAPI, React y despliegue end-to-end
-- [ ] **Fase 1** — Salas y autenticación anónima
+- [x] **Fase 1** — Salas y autenticación anónima
 - [ ] **Fase 2** — Cola de canciones con búsqueda en YouTube
 - [ ] **Fase 3** — Votación y reordenamiento en tiempo real
 - [ ] **Fase 4** — Reproducción y control de la sala
