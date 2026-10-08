@@ -103,10 +103,15 @@ function Sala({ usuario }) {
   useEffect(() => {
     if (!salaId) return
 
-    const intervalo = setInterval(cargarCola, 15000)
+    function ponerseAlDia() {
+      cargarCola()
+      recargarSala()
+    }
+
+    const intervalo = setInterval(ponerseAlDia, 15000)
 
     function alVolver() {
-      if (!document.hidden) cargarCola()
+      if (!document.hidden) ponerseAlDia()
     }
 
     document.addEventListener('visibilitychange', alVolver)
@@ -115,7 +120,7 @@ function Sala({ usuario }) {
       clearInterval(intervalo)
       document.removeEventListener('visibilitychange', alVolver)
     }
-  }, [salaId, cargarCola])
+  }, [salaId, cargarCola, recargarSala])
 
   async function alternarVoto(cancion) {
     const yaVotada = cancion.voted_by_me
