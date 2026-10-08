@@ -47,8 +47,7 @@ def crear_sala(datos: CrearSala, usuario=Depends(usuario_actual)):
     raise HTTPException(status_code=500, detail="No se pudo generar un código único")
 
 
-@router.get("/{code}")
-def obtener_sala(code: str):
+def buscar_sala(code: str) -> dict:
     resultado = supabase.table("rooms").select("*").eq("code", code.upper()).execute()
 
     if not resultado.data:
@@ -57,9 +56,14 @@ def obtener_sala(code: str):
     return resultado.data[0]
 
 
+@router.get("/{code}")
+def obtener_sala(code: str, usuario=Depends(usuario_actual)):
+    return buscar_sala(code)
+
+
 @router.post("/{code}/join", status_code=201)
 def unirse_a_sala(code: str, usuario=Depends(usuario_actual)):
-    sala = obtener_sala(code)
+    sala = buscar_sala(code)
 
     try:
         supabase.table("room_members").insert(
@@ -71,9 +75,10 @@ def unirse_a_sala(code: str, usuario=Depends(usuario_actual)):
 
     return sala
 
+
 @router.post("/{code}/queue", status_code=201)
 def agregar_a_cola(code: str, datos: AgregarCancion, usuario=Depends(usuario_actual)):
-    sala = obtener_sala(code)
+    sala = buscar_sala(code)
 
     pendientes = (
         supabase.table("queue_items")
