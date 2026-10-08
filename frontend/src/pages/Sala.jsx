@@ -98,6 +98,25 @@ function Sala({ usuario }) {
     }
   }, [salaId, cargarCola, recargarSala])
 
+  // Red de seguridad: si Realtime se cae o el navegador suspende la pestaña,
+  // igual nos ponemos al día cada poco y al volver a la pestaña.
+  useEffect(() => {
+    if (!salaId) return
+
+    const intervalo = setInterval(cargarCola, 15000)
+
+    function alVolver() {
+      if (!document.hidden) cargarCola()
+    }
+
+    document.addEventListener('visibilitychange', alVolver)
+
+    return () => {
+      clearInterval(intervalo)
+      document.removeEventListener('visibilitychange', alVolver)
+    }
+  }, [salaId, cargarCola])
+
   async function alternarVoto(cancion) {
     const yaVotada = cancion.voted_by_me
 
