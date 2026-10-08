@@ -142,7 +142,7 @@ function Sala({ usuario }) {
         <p className="mb-3 text-left text-xs uppercase tracking-widest text-neutral-500">
           en cola
         </p>
-        <Cola salaId={sala.id} />
+        <Cola code={sala.code} salaId={sala.id} />
       </div>
 
       <Link

@@ -116,3 +116,27 @@ def agregar_a_cola(code: str, datos: AgregarCancion, usuario=Depends(usuario_act
         raise
 
     return resultado.data[0]
+
+@router.get("/{code}/queue")
+def ver_cola(code: str, usuario=Depends(usuario_actual)):
+    sala = buscar_sala(code)
+
+    resultado = (
+        supabase.table("queue_items")
+        .select("*, votes(user_id)")
+        .eq("room_id", sala["id"])
+        .eq("status", "pending")
+        .execute()
+    )
+
+    cola = []
+
+    for item in resultado.data:
+        votantes = [voto["user_id"] for voto in item.pop("votes", [])]
+        item["votes"] = len(votantes)
+        item["voted_by_me"] = usuario.id in votantes
+        cola.append(item)
+
+    cola.sort(key=lambda item: (-item["votes"], item["created_at"]))
+
+    return {"queue": cola}
