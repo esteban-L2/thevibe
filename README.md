@@ -77,7 +77,7 @@ Queda en http://localhost:5173. Por defecto apunta a `http://localhost:8000`; pa
 - [x] **Fase 0** — Infraestructura: Supabase, FastAPI, React y despliegue end-to-end
 - [x] **Fase 1** — Salas y autenticación anónima
 - [x] **Fase 2** — Cola de canciones con búsqueda en YouTube
-- [ ] **Fase 3** — Votación y reordenamiento en tiempo real
+- [x] **Fase 3** — Votación y reordenamiento en tiempo real
 - [ ] **Fase 4** — Reproducción y control de la sala
 - [ ] **Fase 5** — Capa de IA: recomendación y detección del "vibe"
 - [ ] **Fase 6** — Pulido, animaciones y optimistic UI

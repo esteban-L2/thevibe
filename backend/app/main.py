@@ -8,6 +8,7 @@ from app.auth import usuario_actual
 from app.config import FRONTEND_ORIGINS
 from app.rooms import router as rooms_router
 from app.search import router as search_router
+from app.votes import router as votes_router
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -19,6 +20,7 @@ app = FastAPI(
 
 app.include_router(rooms_router)
 app.include_router(search_router)
+app.include_router(votes_router)
 
 
 @app.middleware("http")
