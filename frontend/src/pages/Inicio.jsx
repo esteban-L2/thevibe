@@ -99,7 +99,7 @@ function Inicio({ usuario }) {
     >
       <motion.div
         variants={contenedor}
-        className="flex flex-col items-center md:items-start md:text-left"
+        className="flex min-w-0 flex-col items-center md:items-start md:text-left"
       >
         <motion.div variants={elemento} className="relative self-center">
           <motion.div
@@ -121,7 +121,7 @@ function Inicio({ usuario }) {
 
         <motion.h1
           variants={elemento}
-          className="mt-3 bg-gradient-to-r from-white via-fuchsia-300 to-violet-400 bg-[length:200%_auto] bg-clip-text text-7xl font-bold tracking-tighter text-transparent drop-shadow-[0_4px_30px_rgba(168,85,247,0.4)]"
+          className="mt-3 bg-gradient-to-r from-white via-fuchsia-300 to-violet-400 bg-[length:200%_auto] bg-clip-text text-[clamp(2.75rem,15vw,4.5rem)] font-bold leading-[1.05] tracking-tighter text-transparent drop-shadow-[0_4px_30px_rgba(168,85,247,0.4)]"
           animate={{ backgroundPosition: ['0% 50%', '200% 50%'] }}
           transition={{ duration: 9, repeat: Infinity, ease: 'linear' }}
         >
@@ -156,7 +156,7 @@ function Inicio({ usuario }) {
         </motion.div>
       </motion.div>
 
-      <motion.div variants={elemento} className="w-full">
+      <motion.div variants={elemento} className="w-full min-w-0">
         <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-black/50 backdrop-blur-md">
           <form onSubmit={crearSala}>
             <label className="mb-2 block text-left text-xs uppercase tracking-widest text-neutral-500">
