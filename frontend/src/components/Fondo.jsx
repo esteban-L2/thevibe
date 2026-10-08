@@ -2,17 +2,17 @@ import { motion } from 'motion/react'
 
 const ORBES = [
   {
-    clase: 'left-1/2 top-1/3 h-[34rem] w-[34rem] bg-violet-600/20',
+    clase: 'left-1/2 top-1/3 h-[22rem] w-[22rem] bg-violet-600/20 sm:h-[34rem] sm:w-[34rem]',
     movimiento: { x: [0, 80, -40, 0], y: [0, -60, 40, 0], scale: [1, 1.15, 0.95, 1] },
     duracion: 26,
   },
   {
-    clase: 'left-1/4 top-2/3 h-[26rem] w-[26rem] bg-fuchsia-600/20',
+    clase: 'left-1/4 top-2/3 h-[18rem] w-[18rem] bg-fuchsia-600/20 sm:h-[26rem] sm:w-[26rem]',
     movimiento: { x: [0, -70, 50, 0], y: [0, 50, -30, 0], scale: [1, 0.9, 1.1, 1] },
     duracion: 32,
   },
   {
-    clase: 'left-3/4 top-1/4 h-[22rem] w-[22rem] bg-indigo-500/20',
+    clase: 'left-3/4 top-1/4 h-[15rem] w-[15rem] bg-indigo-500/20 sm:h-[22rem] sm:w-[22rem]',
     movimiento: { x: [0, 40, -60, 0], y: [0, 70, 20, 0], scale: [1, 1.2, 1, 1] },
     duracion: 38,
   },
@@ -20,7 +20,10 @@ const ORBES = [
 
 function Fondo() {
   return (
-    <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+    <div
+      className="pointer-events-none fixed inset-0 overflow-hidden [contain:paint]"
+      aria-hidden="true"
+    >
       {ORBES.map(({ clase, movimiento, duracion }) => (
         <motion.div
           key={clase}
