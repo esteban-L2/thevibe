@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import { Route, Routes } from 'react-router-dom'
 import { supabase } from './lib/supabase'
+import Fondo from './components/Fondo'
 import Inicio from './pages/Inicio'
 import Sala from './pages/Sala'
 
@@ -32,7 +33,7 @@ function App() {
 
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-neutral-950 px-6 py-24 text-center">
-      <div className="pointer-events-none absolute top-1/2 left-1/2 h-[40rem] w-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/20 blur-[120px]" />
+      <Fondo />
 
       <Routes>
         <Route path="/" element={<Inicio usuario={usuario} />} />
