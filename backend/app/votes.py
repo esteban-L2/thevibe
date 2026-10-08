@@ -20,7 +20,9 @@ def votar(item_id: str, usuario=Depends(usuario_actual)):
         if error.code == CODIGO_DUPLICADO:
             return {"voted": True}
         if error.code == CODIGO_SIN_REFERENCIA:
-            raise HTTPException(status_code=404, detail="Esa canción ya no está en la cola")
+            raise HTTPException(
+                status_code=404, detail="Esa canción ya no está en la cola"
+            )
         raise
 
     return {"voted": True}
