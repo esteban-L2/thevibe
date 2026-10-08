@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import { Route, Routes } from 'react-router-dom'
 import { supabase } from './lib/supabase'
+import AvisoLento from './components/AvisoLento'
 import Fondo from './components/Fondo'
 import Inicio from './pages/Inicio'
 
@@ -37,6 +38,7 @@ function App() {
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-neutral-950 px-6 py-24 text-center">
       <Fondo />
+      <AvisoLento />
 
       <Suspense
         fallback={

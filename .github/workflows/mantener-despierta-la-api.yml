@@ -1,0 +1,18 @@
+name: Mantener despierta la API
+
+# El plan gratuito de Render duerme el servicio tras 15 minutos sin tráfico y
+# tarda hasta un minuto en despertar. Este ping periódico evita ese arranque
+# en frío mientras el proyecto está en el portafolio.
+on:
+  schedule:
+    - cron: '*/14 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Llamar al endpoint de salud
+        run: |
+          curl -sS --fail --max-time 120 \
+            https://thevibe-api.onrender.com/health
