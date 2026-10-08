@@ -5,7 +5,7 @@ from postgrest.exceptions import APIError
 
 from app.auth import usuario_actual
 from app.db import supabase
-from app.schemas import AgregarCancion, CrearSala
+from app.schemas import AgregarCancion, AjustesSala, CrearSala
 
 router = APIRouter(prefix="/rooms", tags=["salas"])
 
@@ -115,16 +115,17 @@ def agregar_a_cola(code: str, datos: AgregarCancion, usuario=Depends(usuario_act
             )
         raise
 
+    if cancion_actual(sala["id"]) is None:
+        promover_siguiente(sala["id"])
+
     return resultado.data[0]
 
-@router.get("/{code}/queue")
-def ver_cola(code: str, usuario=Depends(usuario_actual)):
-    sala = buscar_sala(code)
 
+def cola_ordenada(room_id: str, user_id: str | None = None) -> list[dict]:
     resultado = (
         supabase.table("queue_items")
         .select("*, votes(user_id)")
-        .eq("room_id", sala["id"])
+        .eq("room_id", room_id)
         .eq("status", "pending")
         .execute()
     )
@@ -134,9 +135,85 @@ def ver_cola(code: str, usuario=Depends(usuario_actual)):
     for item in resultado.data:
         votantes = [voto["user_id"] for voto in item.pop("votes", [])]
         item["votes"] = len(votantes)
-        item["voted_by_me"] = usuario.id in votantes
+        item["voted_by_me"] = user_id in votantes
         cola.append(item)
 
     cola.sort(key=lambda item: (-item["votes"], item["created_at"]))
 
-    return {"queue": cola}
+    return cola
+
+
+def cancion_actual(room_id: str) -> dict | None:
+    resultado = (
+        supabase.table("queue_items")
+        .select("*")
+        .eq("room_id", room_id)
+        .eq("status", "playing")
+        .limit(1)
+        .execute()
+    )
+
+    return resultado.data[0] if resultado.data else None
+
+
+def promover_siguiente(room_id: str) -> dict | None:
+    actual = cancion_actual(room_id)
+
+    if actual:
+        supabase.table("queue_items").update({"status": "played"}).eq(
+            "id", actual["id"]
+        ).execute()
+
+    cola = cola_ordenada(room_id)
+
+    if not cola:
+        return None
+
+    siguiente = cola[0]
+
+    supabase.table("queue_items").update({"status": "playing"}).eq(
+        "id", siguiente["id"]
+    ).execute()
+
+    return siguiente
+
+
+@router.get("/{code}/queue")
+def ver_cola(code: str, usuario=Depends(usuario_actual)):
+    sala = buscar_sala(code)
+
+    return {
+        "current": cancion_actual(sala["id"]),
+        "queue": cola_ordenada(sala["id"], usuario.id),
+    }
+
+
+@router.post("/{code}/next")
+def siguiente_cancion(code: str, usuario=Depends(usuario_actual)):
+    sala = buscar_sala(code)
+
+    if usuario.id != sala["host_id"] and not sala["guests_can_skip"]:
+        raise HTTPException(
+            status_code=403, detail="Solo el host puede pasar de canción"
+        )
+
+    return {"current": promover_siguiente(sala["id"])}
+
+
+@router.patch("/{code}/settings")
+def cambiar_ajustes(code: str, datos: AjustesSala, usuario=Depends(usuario_actual)):
+    sala = buscar_sala(code)
+
+    if usuario.id != sala["host_id"]:
+        raise HTTPException(
+            status_code=403, detail="Solo el host puede cambiar los ajustes"
+        )
+
+    resultado = (
+        supabase.table("rooms")
+        .update({"guests_can_skip": datos.guests_can_skip})
+        .eq("id", sala["id"])
+        .execute()
+    )
+
+    return resultado.data[0]
