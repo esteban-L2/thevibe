@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import { Route, Routes } from 'react-router-dom'
 import { supabase } from './lib/supabase'
 import Fondo from './components/Fondo'
 import Inicio from './pages/Inicio'
-import Sala from './pages/Sala'
+
+// La vista de sala (con el reproductor de YouTube) se descarga solo cuando
+// alguien entra a una sala, no al abrir la portada.
+const Sala = lazy(() => import('./pages/Sala'))
 
 function App() {
   const [usuario, setUsuario] = useState(null)
@@ -35,10 +38,18 @@ function App() {
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-neutral-950 px-6 py-24 text-center">
       <Fondo />
 
-      <Routes>
-        <Route path="/" element={<Inicio usuario={usuario} />} />
-        <Route path="/sala/:code" element={<Sala usuario={usuario} />} />
-      </Routes>
+      <Suspense
+        fallback={
+          <p className="relative z-10 animate-pulse text-sm text-neutral-500">
+            cargando la sala…
+          </p>
+        }
+      >
+        <Routes>
+          <Route path="/" element={<Inicio usuario={usuario} />} />
+          <Route path="/sala/:code" element={<Sala usuario={usuario} />} />
+        </Routes>
+      </Suspense>
 
       <motion.footer
         initial={{ opacity: 0 }}
