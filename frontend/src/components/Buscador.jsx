@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { apiFetch } from '../lib/api'
 
-function Buscador({ code }) {
+function Buscador({ code, onAgregada }) {
   const [consulta, setConsulta] = useState('')
   const [resultados, setResultados] = useState([])
   const [buscando, setBuscando] = useState(false)
@@ -37,6 +37,7 @@ function Buscador({ code }) {
       })
       setResultados([])
       setConsulta('')
+      onAgregada?.()
     } catch (err) {
       setError(err.message)
     } finally {

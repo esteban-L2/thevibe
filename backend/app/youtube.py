@@ -1,3 +1,4 @@
+import html
 import time
 
 import httpx
@@ -44,8 +45,8 @@ def buscar_canciones(consulta: str, maximo: int = 8) -> list[dict]:
 
         resultados.append({
             "video_id": video_id,
-            "title": snippet["title"],
-            "channel": snippet.get("channelTitle"),
+            "title": html.unescape(snippet["title"]),
+            "channel": html.unescape(snippet.get("channelTitle") or ""),
             "thumbnail_url": miniatura.get("url"),
         })
 
