@@ -3,13 +3,20 @@ import { Link, useParams } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { supabase } from '../lib/supabase'
 import { apiFetch } from '../lib/api'
+import { marcarVisto, yaVisto } from '../lib/preferencias'
 import Buscador from '../components/Buscador'
 import Cola from '../components/Cola'
 import Reproductor from '../components/Reproductor'
+import Tutorial from '../components/Tutorial'
+
+// El sufijo de versión permite volver a mostrarlo si algún día cambia el
+// tutorial: basta con subirlo a v2.
+const CLAVE_TUTORIAL = 'tutorial-sala-v1'
 
 function Sala({ usuario }) {
   const { code } = useParams()
 
+  const [tutorialAbierto, setTutorialAbierto] = useState(() => !yaVisto(CLAVE_TUTORIAL))
   const [sala, setSala] = useState(null)
   const [miembros, setMiembros] = useState([])
   const [actual, setActual] = useState(null)
@@ -168,6 +175,11 @@ function Sala({ usuario }) {
     }
   }
 
+  function cerrarTutorial() {
+    marcarVisto(CLAVE_TUTORIAL)
+    setTutorialAbierto(false)
+  }
+
   async function copiarCodigo() {
     await navigator.clipboard.writeText(code)
     setCopiado(true)
@@ -201,6 +213,8 @@ function Sala({ usuario }) {
       transition={{ duration: 0.6, ease: 'easeOut' }}
       className="relative z-10 flex w-full max-w-xl flex-col items-center"
     >
+      <Tutorial abierto={tutorialAbierto} onCerrar={cerrarTutorial} />
+
       <p className="text-xs uppercase tracking-widest text-neutral-500">sala</p>
       <h1 className="mt-2 text-3xl font-semibold text-neutral-100">{sala.name}</h1>
 
@@ -276,9 +290,18 @@ function Sala({ usuario }) {
         <Cola canciones={cola} onVotar={alternarVoto} />
       </div>
 
-      <Link to="/" className="mt-10 text-sm text-neutral-500 transition-colors hover:text-violet-400">
-        ← salir de la sala
-      </Link>
+      <div className="mt-10 flex items-center gap-4 text-sm text-neutral-500">
+        <Link to="/" className="transition-colors hover:text-violet-400">
+          ← salir de la sala
+        </Link>
+        <span className="text-neutral-800">·</span>
+        <button
+          onClick={() => setTutorialAbierto(true)}
+          className="transition-colors hover:text-violet-400"
+        >
+          ¿cómo funciona?
+        </button>
+      </div>
     </motion.div>
   )
 }
