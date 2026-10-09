@@ -1,3 +1,4 @@
+import logging
 import secrets
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -5,7 +6,10 @@ from postgrest.exceptions import APIError
 
 from app.auth import usuario_actual
 from app.db import supabase
+from app.ia import detectar_vibe, hay_ia
 from app.schemas import AgregarCancion, AjustesSala, CrearSala
+
+logger = logging.getLogger("uvicorn.error")
 
 router = APIRouter(prefix="/rooms", tags=["salas"])
 
@@ -198,6 +202,23 @@ def siguiente_cancion(code: str, usuario=Depends(usuario_actual)):
         )
 
     return {"current": promover_siguiente(sala["id"])}
+
+
+@router.get("/{code}/vibe")
+def ver_vibe(code: str, usuario=Depends(usuario_actual)):
+    if not hay_ia():
+        raise HTTPException(status_code=503, detail="La capa de IA no está configurada")
+
+    sala = buscar_sala(code)
+
+    actual = cancion_actual(sala["id"])
+    canciones = ([actual] if actual else []) + cola_ordenada(sala["id"])
+
+    try:
+        return {"vibe": detectar_vibe(sala["id"], canciones)}
+    except Exception:
+        logger.exception("Fallo al detectar el vibe de la sala %s", code)
+        raise HTTPException(status_code=502, detail="No se pudo leer el vibe de la sala")
 
 
 @router.patch("/{code}/settings")

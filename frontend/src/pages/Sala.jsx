@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { motion } from 'motion/react'
+import { AnimatePresence, motion } from 'motion/react'
 import { supabase } from '../lib/supabase'
 import { apiFetch } from '../lib/api'
 import { marcarVisto, yaVisto } from '../lib/preferencias'
@@ -24,6 +24,7 @@ function Sala({ usuario }) {
   const [error, setError] = useState(null)
   const [aviso, setAviso] = useState(null)
   const [copiado, setCopiado] = useState(false)
+  const [vibe, setVibe] = useState(null)
 
   const salaId = sala?.id
 
@@ -129,6 +130,31 @@ function Sala({ usuario }) {
     }
   }, [salaId, cargarCola, recargarSala])
 
+  // Firma de lo que suena y lo que espera: solo le preguntamos a la IA cuando
+  // el repertorio cambia de verdad, no en cada recarga de la cola.
+  const firmaCanciones = [actual?.video_id, ...cola.map((item) => item.video_id)]
+    .filter(Boolean)
+    .sort()
+    .join(',')
+
+  useEffect(() => {
+    if (!firmaCanciones) return
+
+    let cancelado = false
+
+    apiFetch(`/rooms/${code}/vibe`)
+      .then((datos) => {
+        if (!cancelado) setVibe(datos.vibe)
+      })
+      .catch(() => {
+        // Sin llave de IA o error puntual: la sala funciona igual, sin insignia.
+      })
+
+    return () => {
+      cancelado = true
+    }
+  }, [code, firmaCanciones])
+
   async function alternarVoto(cancion) {
     const yaVotada = cancion.voted_by_me
 
@@ -229,6 +255,23 @@ function Sala({ usuario }) {
           {copiado ? '¡copiado!' : 'toca para copiar'}
         </span>
       </button>
+
+      <AnimatePresence mode="wait">
+        {vibe && (
+          <motion.div
+            key={vibe.etiqueta}
+            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.95 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            title={vibe.descripcion}
+            className="mt-5 flex items-center gap-2 rounded-full border border-violet-500/30 bg-gradient-to-r from-violet-500/15 to-fuchsia-500/15 px-4 py-1.5 backdrop-blur-sm"
+          >
+            <span className="text-base">{vibe.emoji}</span>
+            <span className="text-sm font-medium text-violet-200">{vibe.etiqueta}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="mt-6 flex items-center gap-3 text-sm text-neutral-400">
         <span className="flex h-2 w-2 rounded-full bg-emerald-400" />
